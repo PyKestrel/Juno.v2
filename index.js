@@ -6,9 +6,11 @@ const {
   joinVoiceChannel,
   getVoiceConnection,
   AudioPlayerStatus,
+  AudioPlayerStates,
   AudioResource,
   AudioPlayer,
   createAudioPlayer,
+  createAudioResource,
 } = require("@discordjs/voice");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
@@ -17,7 +19,7 @@ const ytdl = require("ytdl-core");
 const yts = require("yt-search");
 
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES] });
 
 // When the client is ready, run this code (only once)
 client.once("ready", () => {
@@ -35,27 +37,23 @@ const commands = [
     .setDescription(
       "Search For Music, Play Songs/Playlists From YouTube or Spotify!"
     )
-    .addSubcommand((option) =>
-      option
-        .setName("search")
-        .setDescription("Search For A Song Name")
-        .addStringOption((option) =>
+    .addStringOption((option) =>
           option
-            .setName("query")
-            .setDescription("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-            .setRequired(true)
-        )
+            .setName("search")
+            .setDescription("Never Gonna Give You Up")
+            .setRequired(false)
     )
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName("url")
-        .setDescription("Pass a YouTube/Spotify URL")
-        .addStringOption((option) =>
+    .addStringOption((option) =>
           option
-            .setName("link")
+            .setName("youtube")
             .setDescription("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-            .setRequired(true)
-        )
+            .setRequired(false)
+    )
+    .addStringOption((option) =>
+          option
+            .setName("spotify")
+            .setDescription("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT?si=e018a665dc3a428d")
+            .setRequired(false)
     ),
   new SlashCommandBuilder()
     .setName("disconnect")
@@ -117,19 +115,51 @@ The function is in charge of building the audioPLayer object that will hold our 
 */
 
 async function subscribeChannelConnection(interaction) {
-  let audioPlayer = new AudioPlayer();
+  // Audio Player Object Instantiation
+  let player = createAudioPlayer();
+  // Get Voice Channel ID & Connect To Voice Channel
   const channel = interaction.member.voice.channel;
   const connection = getVoiceConnection(channel.guild.id);
-  const subscription = connection.subscribe(audioPlayer);
+  // Option Variable Contains Link or Search
+  const stream = await audioParser(interaction)
+  // Create Audio Resource From Stream
+  const resource = createAudioResource(stream);
+  // Create Subscription
+  connection.subscribe(player);
+  // Play YTDL Stream
+  player.play(resource)
 }
 
 /*
 
-The ytdlSearch function is used to take a search string and find an associated youtube audio.
+The audioParser function is used to take a search string or link and find an associated youtube audio.
 
 */
-async function ytdlSearch(){
-    
+async function audioParser(interaction){
+  let option = interaction.options.data[0].name;
+  let value = interaction.options.data[0].value;
+  let stream
+  switch (option) {
+    case "search":
+      
+    break;
+    case "youtube":
+      const regex = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})$/;
+      const isValidUrl = regex.test(value);
+      if(isValidUrl){
+        stream = ytdl(value, { filter: 'audioonly' })
+      }else{
+        interaction.followUp("Invalid YouTube Link")
+      }
+    break;
+    case "spotify":
+      
+    break;
+    default:
+      
+    break;
+  }
+  return stream
 }
 
 
@@ -147,17 +177,24 @@ client.on("interactionCreate", async (interaction) => {
       break;
     case "play":
       // Use Interaction Object To Get Which Sub-Command Was Used And Retrive Its Name & Value
-      let type = interaction.options.data[0].name;
+      let type;
+      try {
+        type = interaction.options.data[0].name;  
+      } catch (error) {
+        type = ""
+      }
       if (type == "search") {
         interaction.reply(
-          `Searching For ${interaction.options.data[0].options[0].value}`
+          `Searching For ${interaction.options.data[0].value}`
         );
-        let commandOption = interaction.options.data[0].options[0].value;
-        createChannelConnection(interaction);
-      } else if (type == "url") {
+        await createChannelConnection(interaction);
+        await subscribeChannelConnection(interaction);
+      } else if (type == "youtube" || type == "spotify") {
         interaction.reply(`Fetching Your Audio!`);
-        let commandOption = interaction.options.data[0].options[0].value;
-        createChannelConnection(interaction);
+        await createChannelConnection(interaction);
+        await subscribeChannelConnection(interaction);
+      }else{
+        await interaction.reply("Command Error: Make Sure To Use Proper Options");
       }
       break;
     case "disconnect":

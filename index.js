@@ -192,8 +192,6 @@ async function audioParser(interaction) {
       let yt_info = await play.search(value, {
         limit: 1,
       });
-      // Take returned object and pass it to the stream function of the play object, assign this object to the stream variable.
-      //stream = await play.stream(yt_info[0].url);
 
       // Push YouTube Link To Global Music Queue Array
       globalMusicQueue.push(yt_info[0].url);
@@ -207,14 +205,10 @@ async function audioParser(interaction) {
 
       // Validate URL
       if (isValidUrl) {
-        // YTDL Version
-        //stream = ytdl(value, { filter: "audioonly" });
 
         // PlayDL Version
         // Get video information from YouTube link.
         let yt_info = await play.video_info(value);
-        // Take returned object and pass it to the stream_from_info function of the play object, assign this object to the stream variable.
-        // stream = await play.stream_from_info(yt_info);
 
         // Push YouTube Link To Global Music Queue Array
         globalMusicQueue.push(yt_info.video_details.url);

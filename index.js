@@ -65,7 +65,7 @@ const commands = [
     .setDescription("Disconnect Juno from Voice Channel"),
   new SlashCommandBuilder()
     .setName("skip")
-    .setDescription("Skip the current playing song!")
+    .setDescription("Skip the current playing song!"),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: "9" }).setToken(token);
@@ -146,6 +146,8 @@ async function subscribeChannelConnection(interaction) {
     connection.subscribe(player);
     // Play YTDL Stream
     player.play(await BuildAudioStream());
+    // Sending Pre-Made embed that states we're fecthing the audio
+    interaction.channel.send({ embeds: [audioFetchEmbed] });
   } else {
     // Reply That The Song Has Been Added To The Queue
     interaction.followUp("Song Added To Queue!");
@@ -202,42 +204,41 @@ async function audioParser(interaction) {
       break;
     case "youtube":
       // Use regex to verify that the link is a valid YouTube link
-      const regex =
-        /^(?:https?:\/\/)?(?:www\.)?youtube\.com/;
+      const regex = /^(?:https?:\/\/)?(?:www\.)?youtube\.com/;
       const isValidUrl = regex.test(value);
 
       // Validate URL
       if (isValidUrl) {
-        
         // Check if the link is a playlist
         if (value.includes("playlist")) {
-            // Parse YouTube Playlist
-        const playlist = await play.playlist_info(value)
-        // Get Info For Each Video
-        const videos = await playlist.all_videos()
-        // For Each Video Object Get The URL and Push It To The Music Queue
-        videos.forEach(element => {
-            console.log(element.url)
-            globalMusicQueue.push(element.url)
-        })
+          // Parse YouTube Playlist
+          const playlist = await play.playlist_info(value);
+          // Get Info For Each Video
+          const videos = await playlist.all_videos();
+          // For Each Video Object Get The URL and Push It To The Music Queue
+          videos.forEach((element) => {
+            console.log(element.url);
+            globalMusicQueue.push(element.url);
+          });
         } else {
-        // PlayDL Version
-        // Get video information from YouTube link.
-        let yt_info = await play.video_info(value);
+          // PlayDL Version
+          // Get video information from YouTube link.
+          let yt_info = await play.video_info(value);
 
-        // Push YouTube Link To Global Music Queue Array
-        globalMusicQueue.push(yt_info.video_details.url);
+          // Push YouTube Link To Global Music Queue Array
+          globalMusicQueue.push(yt_info.video_details.url);
         }
-
-
-        
-        
       } else {
         // "Catch All For YouTube"
         interaction.followUp("Invalid YouTube Link");
       }
       break;
     case "spotify":
+        // NOTE ADD SPOTIFY LINK VALIDATION
+
+        // Check Spotify Link Details
+        let result = await play.spotify(value)
+        console.log(result.name)
       break;
     default:
       break;
@@ -276,6 +277,13 @@ It will check the length of the array and determine whether to skip the song or 
 */
 
 async function audioSkip(interaction) {
+    /* 
+    
+    1. Check the length of the globalMusicQueue. If the length is greater than 1, shift the array and call the BuildAudioStream function.
+    2. If the length is equal to 1, call the deleteChannelConnection function.
+    3. Catch all, call the deleteChannelConnection function
+
+    */
   if (globalMusicQueue.length > 1) {
     interaction.reply("Skipping Song");
     globalMusicQueue.shift();
@@ -285,7 +293,7 @@ async function audioSkip(interaction) {
     deleteChannelConnection(interaction);
     globalMusicQueue.shift();
   } else {
-    interaction.reply("Couldnt Skip Song");
+    deleteChannelConnection(interaction);
   }
 }
 
@@ -373,8 +381,6 @@ client.on("interactionCreate", async (interaction) => {
         interaction.reply("Thinking");
         // Immediately deleting the reply
         interaction.deleteReply();
-        // Sending Pre-Made embed that states we're fecthing the audio
-        interaction.channel.send({ embeds: [audioFetchEmbed] });
         // Calling functions to initiate the audio stream.
         await audioParser(interaction);
         await subscribeChannelConnection(interaction);

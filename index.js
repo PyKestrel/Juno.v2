@@ -63,6 +63,9 @@ const commands = [
   new SlashCommandBuilder()
     .setName("disconnect")
     .setDescription("Disconnect Juno from Voice Channel"),
+  new SlashCommandBuilder()
+    .setName("skip")
+    .setDescription("Skip the current playing song!")
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: "9" }).setToken(token);
@@ -143,9 +146,9 @@ async function subscribeChannelConnection(interaction) {
     connection.subscribe(player);
     // Play YTDL Stream
     player.play(await BuildAudioStream());
-  }else{
+  } else {
     // Reply That The Song Has Been Added To The Queue
-    interaction.followUp("Song Added To Queue!")
+    interaction.followUp("Song Added To Queue!");
   }
   player.on(AudioPlayerStatus.Playing, async () => {});
   player.on(AudioPlayerStatus.Idle, async () => {
@@ -156,14 +159,14 @@ async function subscribeChannelConnection(interaction) {
     3. Otherwise, call the deleteChannelConnection function.
 
     */
-    if(globalMusicQueue.length > 1){
+    if (globalMusicQueue.length > 1) {
       globalMusicQueue.shift();
       player.play(await BuildAudioStream());
-    }else if(globalMusicQueue.length == 1){
+    } else if (globalMusicQueue.length == 1) {
       player.play(await BuildAudioStream());
       globalMusicQueue.shift();
-    }else{
-      deleteChannelConnection(interaction)
+    } else {
+      deleteChannelConnection(interaction);
     }
   });
 }
@@ -200,19 +203,35 @@ async function audioParser(interaction) {
     case "youtube":
       // Use regex to verify that the link is a valid YouTube link
       const regex =
-        /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})$/;
+        /^(?:https?:\/\/)?(?:www\.)?youtube\.com/;
       const isValidUrl = regex.test(value);
 
       // Validate URL
       if (isValidUrl) {
-
+        
+        // Check if the link is a playlist
+        if (value.includes("playlist")) {
+            // Parse YouTube Playlist
+        const playlist = await play.playlist_info(value)
+        // Get Info For Each Video
+        const videos = await playlist.all_videos()
+        // For Each Video Object Get The URL and Push It To The Music Queue
+        videos.forEach(element => {
+            console.log(element.url)
+            globalMusicQueue.push(element.url)
+        })
+        } else {
         // PlayDL Version
         // Get video information from YouTube link.
         let yt_info = await play.video_info(value);
 
         // Push YouTube Link To Global Music Queue Array
         globalMusicQueue.push(yt_info.video_details.url);
-        //interaction.channel.send({ embeds: [createPlayingEmbed(yt_info.video_details)] });
+        }
+
+
+        
+        
       } else {
         // "Catch All For YouTube"
         interaction.followUp("Invalid YouTube Link");
@@ -246,6 +265,28 @@ async function BuildAudioStream() {
 
   // Return Audio Resource Object
   return resource;
+}
+
+/*
+
+The audioSkip function is called when a user uses the /skip switch. This function will remove the current playing song and then play the next song.
+
+It will check the length of the array and determine whether to skip the song or disconnect the bot.
+
+*/
+
+async function audioSkip(interaction) {
+  if (globalMusicQueue.length > 1) {
+    interaction.reply("Skipping Song");
+    globalMusicQueue.shift();
+    player.play(await BuildAudioStream());
+  } else if (globalMusicQueue.length == 1) {
+    interaction.reply("No More Songs, Disconnecting.");
+    deleteChannelConnection(interaction);
+    globalMusicQueue.shift();
+  } else {
+    interaction.reply("Couldnt Skip Song");
+  }
 }
 
 /*
@@ -338,8 +379,11 @@ client.on("interactionCreate", async (interaction) => {
         await audioParser(interaction);
         await subscribeChannelConnection(interaction);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
+      break;
+    case "skip":
+      await audioSkip(interaction);
       break;
     case "disconnect":
       // Let user know that the bot is disconnecting from VC

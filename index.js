@@ -74,6 +74,9 @@ rest
 
 // Voice Channel Functions
 
+// Global Music Queue
+let globalMusicQueue = [];
+
 /*
 
 The CreateChannelConnection function is passed the interaction object when a user initiates the /play slash command.
@@ -109,6 +112,7 @@ async function deleteChannelConnection(interaction) {
   const connection = getVoiceConnection(channel.guild.id);
   //Destroy The Connection
   try {
+    globalMusicQueue = [];
     connection.destroy();
   } catch (error) {
     console.log(error);
@@ -121,28 +125,46 @@ The subscribeChannelConnection is the next step in the Voice Channel connection 
 The function is in charge of building the audioPLayer object that will hold our audio stream.
 
 */
-
+// Audio Player Object Instantiation
+let player;
 async function subscribeChannelConnection(interaction) {
-  // Audio Player Object Instantiation
-  let player = createAudioPlayer();
   // Get Voice Channel ID & Connect To Voice Channel
   const channel = interaction.member.voice.channel;
-  const connection = getVoiceConnection(channel.guild.id);
-  // Option Variable Contains Link or Search
-  const stream = await audioParser(interaction);
-  // Create Audio Resource From Stream
-  const resource = createAudioResource(stream.stream, {
-    inputType: stream.type,
-  });
-  // Create Subscription
-  connection.subscribe(player);
-  // Play YTDL Stream
-  player.play(resource);
-  player.on(AudioPlayerStatus.Playing, () => {
+
+  // Check If There Is An Existing Connection
+  if (typeof getVoiceConnection(channel.guild.id) === "undefined") {
+    // Audio Player Object Instantiation
+    player = createAudioPlayer();
+    // Create Audio Resource From Stream
+    await createChannelConnection(interaction);
+    const connection = getVoiceConnection(channel.guild.id);
+
+    // Create Subscription
+    connection.subscribe(player);
+    // Play YTDL Stream
+    player.play(await BuildAudioStream());
+  }else{
+    // Reply That The Song Has Been Added To The Queue
+    interaction.followUp("Song Added To Queue!")
+  }
+  player.on(AudioPlayerStatus.Playing, async () => {});
+  player.on(AudioPlayerStatus.Idle, async () => {
+    /* 
     
-  });
-  player.on(AudioPlayerStatus.Idle, () => {
-    connection.destroy();
+    1. When AudioPlayerStatus is idle, check the length of the globalMusicQueue. If the length is greater than 1, shift the array and call the BuildAudioStream function.
+    2. If the length is equal to 1, build the last stream.
+    3. Otherwise, call the deleteChannelConnection function.
+
+    */
+    if(globalMusicQueue.length > 1){
+      globalMusicQueue.shift();
+      player.play(await BuildAudioStream());
+    }else if(globalMusicQueue.length == 1){
+      player.play(await BuildAudioStream());
+      globalMusicQueue.shift();
+    }else{
+      deleteChannelConnection(interaction)
+    }
   });
 }
 
@@ -171,7 +193,10 @@ async function audioParser(interaction) {
         limit: 1,
       });
       // Take returned object and pass it to the stream function of the play object, assign this object to the stream variable.
-      stream = await play.stream(yt_info[0].url);
+      //stream = await play.stream(yt_info[0].url);
+
+      // Push YouTube Link To Global Music Queue Array
+      globalMusicQueue.push(yt_info[0].url);
       //interaction.channel.send({ embeds: [createPlayingEmbed(yt_info[0])] });
       break;
     case "youtube":
@@ -189,7 +214,10 @@ async function audioParser(interaction) {
         // Get video information from YouTube link.
         let yt_info = await play.video_info(value);
         // Take returned object and pass it to the stream_from_info function of the play object, assign this object to the stream variable.
-        stream = await play.stream_from_info(yt_info);
+        // stream = await play.stream_from_info(yt_info);
+
+        // Push YouTube Link To Global Music Queue Array
+        globalMusicQueue.push(yt_info.video_details.url);
         //interaction.channel.send({ embeds: [createPlayingEmbed(yt_info.video_details)] });
       } else {
         // "Catch All For YouTube"
@@ -201,8 +229,29 @@ async function audioParser(interaction) {
     default:
       break;
   }
-  // return stream object to be used in the AudioResource object
-  return stream;
+}
+
+/* 
+
+The buildAudioStream Function is designed to grabs the first link in the array, creates a stream object, and builds and returns an AudioResource.
+It should be called when a song finishes, so that the next song can be played.
+
+*/
+
+async function BuildAudioStream() {
+  // Grab YouTube Link From Global Music Queue Array
+  let NextSong = globalMusicQueue[0];
+
+  // Pass URL to the stream function of the play object, assign this object to the stream variable.
+  let stream = await play.stream(NextSong);
+
+  // Create AudioResource Object
+  let resource = createAudioResource(stream.stream, {
+    inputType: stream.type,
+  });
+
+  // Return Audio Resource Object
+  return resource;
 }
 
 /*
@@ -231,7 +280,6 @@ const audioFetchEmbed = {
     text: "Coligo Studios",
   },
 };
-
 
 /*
 
@@ -293,12 +341,10 @@ client.on("interactionCreate", async (interaction) => {
         // Sending Pre-Made embed that states we're fecthing the audio
         interaction.channel.send({ embeds: [audioFetchEmbed] });
         // Calling functions to initiate the audio stream.
-        await createChannelConnection(interaction);
+        await audioParser(interaction);
         await subscribeChannelConnection(interaction);
       } catch (error) {
-        await interaction.reply(
-          "Command Error: Make Sure To Use Proper Options"
-        );
+        console.log(error)
       }
       break;
     case "disconnect":

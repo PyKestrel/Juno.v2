@@ -302,11 +302,12 @@ async function audioSkip(interaction) {
 Embeds Related To Audio Functions
 
 */
+
 const audioFetchEmbed = {
   title: "Searching for your Audio !",
   description: "Give us a few moments to get that for you!\n",
   color: 4321431,
-  timestamp: "2023-04-02T15:12:32.251Z",
+  timestamp: new Date().toISOString(),
   url: "https://discord.com",
   author: {
     name: "Juno",

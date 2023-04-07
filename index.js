@@ -161,12 +161,13 @@ async function subscribeChannelConnection(interaction) {
     3. Otherwise, call the deleteChannelConnection function.
 
     */
+   
     if (globalMusicQueue.length > 1) {
       globalMusicQueue.shift();
       player.play(await BuildAudioStream());
     } else if (globalMusicQueue.length == 1) {
+      player.play(await BuildAudioStream());
       globalMusicQueue.shift();
-      deleteChannelConnection(interaction);
     } else {
       deleteChannelConnection(interaction);
     }

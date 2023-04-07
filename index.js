@@ -165,8 +165,8 @@ async function subscribeChannelConnection(interaction) {
       globalMusicQueue.shift();
       player.play(await BuildAudioStream());
     } else if (globalMusicQueue.length == 1) {
-      player.play(await BuildAudioStream());
       globalMusicQueue.shift();
+      deleteChannelConnection(interaction);
     } else {
       deleteChannelConnection(interaction);
     }
@@ -234,11 +234,11 @@ async function audioParser(interaction) {
       }
       break;
     case "spotify":
-        // NOTE ADD SPOTIFY LINK VALIDATION
+      // NOTE ADD SPOTIFY LINK VALIDATION
 
-        // Check Spotify Link Details
-        let result = await play.spotify(value)
-        console.log(result.name)
+      // Check Spotify Link Details
+      let result = await play.spotify(value);
+      console.log(result.name);
       break;
     default:
       break;
@@ -277,7 +277,7 @@ It will check the length of the array and determine whether to skip the song or 
 */
 
 async function audioSkip(interaction) {
-    /* 
+  /* 
     
     1. Check the length of the globalMusicQueue. If the length is greater than 1, shift the array and call the BuildAudioStream function.
     2. If the length is equal to 1, call the deleteChannelConnection function.

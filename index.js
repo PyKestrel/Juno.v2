@@ -14,11 +14,8 @@ const {
 } = require("@discordjs/voice");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-const { EmbedBuilder } = require("discord.js");
 const ytdl = require("ytdl-core");
 const play = require("play-dl");
-const yts = require("yt-search");
-
 // Create a new client instance
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES],
@@ -199,10 +196,8 @@ async function audioParser(interaction) {
       let yt_info = await play.search(value, {
         limit: 1,
       });
-
       // Push YouTube Link To Global Music Queue Array
       globalMusicQueue.push(yt_info[0]);
-      //interaction.channel.send({ embeds: [createPlayingEmbed(yt_info[0])] });
       break;
     case "youtube":
       // Use regex to verify that the link is a valid YouTube link

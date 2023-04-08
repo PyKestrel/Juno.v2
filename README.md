@@ -1,5 +1,10 @@
 ![JunoBannerGithub2](https://user-images.githubusercontent.com/42158489/230739410-7d1a9c55-a193-4647-8f5d-15a92e6ba4cc.png)
 
+![GitHub language count](https://img.shields.io/github/languages/count/pykestrel/juno.v2?color=33E9E0)
+![GitHub repo file count](https://img.shields.io/github/directory-file-count/pykestrel/juno.v2?color=33E9E0)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/w/pykestrel/juno.v2?color=33E9E0)
+![GitHub](https://img.shields.io/github/license/pykestrel/juno.v2?color=33E9E0)
+
  Allow us to introduce Juno, a refreshed Discord bot template for DiscordJS v13. With updated features and functionality, Juno is ready to take your Discord server to the next level!
  > Originally built in 2020, Juno was in need of a major overhaul to bring it up to date with the latest standards and technologies. We've worked hard to refresh Juno and equip it with the latest features and capabilities for an even better user experience.
  

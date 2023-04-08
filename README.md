@@ -1,16 +1,16 @@
 # Juno v2
- We would like to introduce you to Juno, a Discord bot template refreshed for DiscordJS v13.
- > Juno was originally built in 2020 & needed a massive overhaul.
+ Allow us to introduce Juno, a refreshed Discord bot template for DiscordJS v13. With updated features and functionality, Juno is ready to take your Discord server to the next level!
+ > Originally built in 2020, Juno was in need of a major overhaul to bring it up to date with the latest standards and technologies. We've worked hard to refresh Juno and equip it with the latest features and capabilities for an even better user experience.
  
- The refresh includes:
- - Reworked legacy functions!
- - Same great music features which a newly introduced music queue system!
- - Support for Spotify & YouTube links!
- **New**
- - Role Management System (RMS)
- - Twitch Drop Notifier & much much more!
+The refresh includes:
 
-Juno is community driven and designed in a way that can be built upon and modified by anyone. We encourage that you contribute to the Discord community by building features that help & entertain everyone!
+- Reworked legacy functions, bringing improved performance and stability to Juno!
+- Introduction of a new music queue system, along with the same great music features that users love!
+- Support for Spotify & YouTube links, providing even more options for users to enjoy their favorite tunes! New
+- Role Management System (RMS) to help manage and organize your Discord community.
+- Twitch Drop Notifier and much more!
+
+Juno is a community-driven project designed to be customizable and modifiable by anyone. We encourage all users to contribute to the Discord community by creating new features that entertain and help everyone.
 
 ## Voice Channel Functions
 The **CreateChannelConnection** function receives the interaction object when a user triggers the /play slash command. We use the interaction object to retrieve information about the VoiceChannel that the user is in and pass that information to the joinVoiceChannel function.

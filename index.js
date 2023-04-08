@@ -121,7 +121,7 @@ async function deleteChannelConnection(interaction) {
 
 /*
 
-The subscribeChannelConnection is the next step in the Voice Channel connection and is in charge of streaming the actual aduio to the voice channel.
+The subscribeChannelConnection is the next step in the Voice Channel connection and is in charge of streaming the actual audio to the voice channel.
 The function is in charge of building the audioPLayer object that will hold our audio stream.
 
 */

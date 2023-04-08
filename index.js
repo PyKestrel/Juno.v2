@@ -149,16 +149,12 @@ async function subscribeChannelConnection(interaction) {
     await nowPlayingEmbed(interaction);
     // Play YTDL Stream
     player.play(await BuildAudioStream());
-    // Sending Pre-Made embed that states we're fecthing the audio
-    
+    globalMusicQueue.shift();
   } else {
     // Reply That The Song Has Been Added To The Queue
-    interaction.followUp("Song Added To Queue!");
-    console.log(globalMusicQueue)
+    interaction.channel.send("Song Added To Queue!");
   }
-  player.on(AudioPlayerStatus.Playing, async () => {
-    
-  });
+  player.on(AudioPlayerStatus.Playing, async () => {});
   player.on(AudioPlayerStatus.Idle, async () => {
     /* 
     
@@ -167,12 +163,10 @@ async function subscribeChannelConnection(interaction) {
     3. Otherwise, call the deleteChannelConnection function.
 
     */
-   
-    if (globalMusicQueue.length > 1) {
-      globalMusicQueue.shift();
+
+    if (globalMusicQueue.length >= 1) {
       await nowPlayingEmbed(interaction);
-      player.play(await BuildAudioStream());
-    } else if (globalMusicQueue.length == 1) {
+      console.log("Idle Embed Kicked Off");
       player.play(await BuildAudioStream());
       globalMusicQueue.shift();
     } else {
@@ -291,15 +285,13 @@ async function audioSkip(interaction) {
     3. Catch all, call the deleteChannelConnection function
 
     */
-  if (globalMusicQueue.length > 1) {
+  if (globalMusicQueue.length >= 1) {
     interaction.reply("Skipping Song");
-    globalMusicQueue.shift();
+    await nowPlayingEmbed(interaction);
     player.play(await BuildAudioStream());
-  } else if (globalMusicQueue.length == 1) {
-    interaction.reply("No More Songs, Disconnecting.");
-    deleteChannelConnection(interaction);
     globalMusicQueue.shift();
   } else {
+    interaction.reply("No More Songs, Disconnecting.");
     deleteChannelConnection(interaction);
   }
 }
@@ -310,11 +302,11 @@ Embeds Related To Audio Functions
 
 */
 
-async function nowPlayingEmbed(interaction){
-  let video = globalMusicQueue[0]
+async function nowPlayingEmbed(interaction) {
+  let video = globalMusicQueue[0];
   let nowPlayingEmbed = {
     title: video.title,
-    description: video.description.substring(0,200),
+    description: video.description?.substring(0, 200),
     color: 16711680,
     timestamp: new Date().toISOString(),
     url: video.url,
@@ -333,7 +325,7 @@ async function nowPlayingEmbed(interaction){
       text: "Coligo Studios",
     },
   };
-  interaction.channel.send({ embeds: [nowPlayingEmbed] }) 
+  interaction.channel.send({ embeds: [nowPlayingEmbed] });
 }
 
 // These are the interactions with the slash commands

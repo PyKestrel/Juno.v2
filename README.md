@@ -1,7 +1,7 @@
 # Juno.v2
  Juno Discord bot for Discord.JS v13.  Reworked legacy functions!
 
-##Voice Channel Functions
+## Voice Channel Functions
 The CreateChannelConnection function receives the interaction object when a user triggers the /play slash command. We use the interaction object to retrieve information about the VoiceChannel that the user is in and pass that information to the joinVoiceChannel function.
 
 The DeleteChannelConnection function receives the interaction object when a user triggers the /disconnect slash command. We use the interaction object to retrieve the active voice connection within the guild and then destroy it, disconnecting the bot.

@@ -1,6 +1,7 @@
 # Juno v2
  We would like to introduce you to Juno, a Discord bot template refreshed for DiscordJS v13.
  > Juno was originally built in 2020 & needed a massive overhaul.
+ 
  The refresh includes:
  - Reworked legacy functions!
  - Same great music features which a newly introduced music queue system!

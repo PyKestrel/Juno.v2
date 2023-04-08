@@ -1,4 +1,5 @@
-# Juno v2
+![JunoBanner3](https://user-images.githubusercontent.com/42158489/230739204-d10e083e-93b0-47e9-beb9-f469e754f1b9.png)
+
  Allow us to introduce Juno, a refreshed Discord bot template for DiscordJS v13. With updated features and functionality, Juno is ready to take your Discord server to the next level!
  > Originally built in 2020, Juno was in need of a major overhaul to bring it up to date with the latest standards and technologies. We've worked hard to refresh Juno and equip it with the latest features and capabilities for an even better user experience.
  

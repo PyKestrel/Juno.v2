@@ -326,6 +326,10 @@ const audioFetchEmbed = {
   },
 };
 
+function nowPlayingEmbed(interaction){
+
+}
+
 /*
 
 THIS EMBED BREAKS DISCORD JS

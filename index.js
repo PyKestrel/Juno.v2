@@ -144,15 +144,21 @@ async function subscribeChannelConnection(interaction) {
 
     // Create Subscription
     connection.subscribe(player);
+
+    // Send Now Playing Embed
+    await nowPlayingEmbed(interaction);
     // Play YTDL Stream
     player.play(await BuildAudioStream());
     // Sending Pre-Made embed that states we're fecthing the audio
-    interaction.channel.send({ embeds: [audioFetchEmbed] });
+    
   } else {
     // Reply That The Song Has Been Added To The Queue
     interaction.followUp("Song Added To Queue!");
+    console.log(globalMusicQueue)
   }
-  player.on(AudioPlayerStatus.Playing, async () => {});
+  player.on(AudioPlayerStatus.Playing, async () => {
+    
+  });
   player.on(AudioPlayerStatus.Idle, async () => {
     /* 
     
@@ -164,6 +170,7 @@ async function subscribeChannelConnection(interaction) {
    
     if (globalMusicQueue.length > 1) {
       globalMusicQueue.shift();
+      await nowPlayingEmbed(interaction);
       player.play(await BuildAudioStream());
     } else if (globalMusicQueue.length == 1) {
       player.play(await BuildAudioStream());
@@ -200,7 +207,7 @@ async function audioParser(interaction) {
       });
 
       // Push YouTube Link To Global Music Queue Array
-      globalMusicQueue.push(yt_info[0].url);
+      globalMusicQueue.push(yt_info[0]);
       //interaction.channel.send({ embeds: [createPlayingEmbed(yt_info[0])] });
       break;
     case "youtube":
@@ -218,8 +225,7 @@ async function audioParser(interaction) {
           const videos = await playlist.all_videos();
           // For Each Video Object Get The URL and Push It To The Music Queue
           videos.forEach((element) => {
-            console.log(element.url);
-            globalMusicQueue.push(element.url);
+            globalMusicQueue.push(element);
           });
         } else {
           // PlayDL Version
@@ -227,11 +233,11 @@ async function audioParser(interaction) {
           let yt_info = await play.video_info(value);
 
           // Push YouTube Link To Global Music Queue Array
-          globalMusicQueue.push(yt_info.video_details.url);
+          globalMusicQueue.push(yt_info.video_details);
         }
       } else {
         // "Catch All For YouTube"
-        interaction.followUp("Invalid YouTube Link");
+        interaction.channel.send("Invalid YouTube Link");
       }
       break;
     case "spotify":
@@ -255,7 +261,7 @@ It should be called when a song finishes, so that the next song can be played.
 
 async function BuildAudioStream() {
   // Grab YouTube Link From Global Music Queue Array
-  let NextSong = globalMusicQueue[0];
+  let NextSong = globalMusicQueue[0].url;
 
   // Pass URL to the stream function of the play object, assign this object to the stream variable.
   let stream = await play.stream(NextSong);
@@ -304,60 +310,31 @@ Embeds Related To Audio Functions
 
 */
 
-const audioFetchEmbed = {
-  title: "Searching for your Audio !",
-  description: "Give us a few moments to get that for you!\n",
-  color: 4321431,
-  timestamp: new Date().toISOString(),
-  url: "https://discord.com",
-  author: {
-    name: "Juno",
-    url: "https://discord.com",
-    icon_url:
-      "https://cdn.discordapp.com/app-icons/1091691524640739420/1bec178a15e9c19dd2db579de06cd399.png?size=256",
-  },
-  thumbnail: {
-    url: "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2F49.media.tumblr.com%2Ff8ed2ebb7347d939ef2678f478c17d6e%2Ftumblr_nyc3qlk8Nq1usv6kvo1_500.gif&f=1&nofb=1&ipt=6012f21e812cd0daf881bba6c3e3225b1a512cd7373f97914243237d8d616db3&ipo=images",
-  },
-  footer: {
-    icon_url:
-      "https://cdn.discordapp.com/app-icons/1091691524640739420/1bec178a15e9c19dd2db579de06cd399.png?size=256",
-    text: "Coligo Studios",
-  },
-};
-
-function nowPlayingEmbed(interaction){
-
-}
-
-/*
-
-THIS EMBED BREAKS DISCORD JS
-
-function createPlayingEmbed(Info){
-  const nowPlayingEmbed = {
-    title: "Now Playing | "+Info.title,
-    color: 4321431,
-    timestamp: "2023-04-02T15:12:32.251Z",
-    url: "https://discord.com",
+async function nowPlayingEmbed(interaction){
+  let video = globalMusicQueue[0]
+  let nowPlayingEmbed = {
+    title: video.title,
+    description: video.description.substring(0,200),
+    color: 16711680,
+    timestamp: new Date().toISOString(),
+    url: video.url,
     author: {
-      name: "Juno",
-      url: "https://discord.com",
+      name: "Juno | Now Playing",
+      url: "https://coligo.one",
       icon_url:
         "https://cdn.discordapp.com/app-icons/1091691524640739420/1bec178a15e9c19dd2db579de06cd399.png?size=256",
+    },
+    thumbnail: {
+      url: video.thumbnails[0]?.url,
     },
     footer: {
       icon_url:
         "https://cdn.discordapp.com/app-icons/1091691524640739420/1bec178a15e9c19dd2db579de06cd399.png?size=256",
       text: "Coligo Studios",
     },
-    image: {
-      url: Info.thumbnails[Info.thumbnails.length - 1].url,
-    },
   };
-  return nowPlayingEmbed
+  interaction.channel.send({ embeds: [nowPlayingEmbed] }) 
 }
-*/
 
 // These are the interactions with the slash commands
 client.on("interactionCreate", async (interaction) => {

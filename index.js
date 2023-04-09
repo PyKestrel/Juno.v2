@@ -234,6 +234,9 @@ async function audioParser(interaction) {
       
       Spotify Works Similar to YouTube above we just query the Spotify URL and then return a Title,
       we use that title to then run a youtube query and play the audio like that.
+
+      To setup your version of the bot with spotify support refer to this link:
+      https://github.com/play-dl/play-dl/blob/1ae7ba8fcea8b93293af5de9e19eca3c2a491804/instructions/README.md
       
       */
       let spot = await play.spotify(value);

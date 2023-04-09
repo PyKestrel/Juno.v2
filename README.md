@@ -16,12 +16,12 @@ The refresh includes:
 - Role Management System (RMS) to help manage and organize your Discord community.
 - Twitch Drop Notifier and much more!
 
-Juno is a community-driven project designed to be customizable and modifiable by anyone. We encourage all users to contribute to the Discord community by creating new features that entertain and help everyone.
+> Juno is a community-driven project designed to be customizable and modifiable by anyone. We encourage all users to contribute to the Discord community by creating new features that entertain and help everyone.
 
 ## ![JunoVCBanner2](https://user-images.githubusercontent.com/42158489/230748562-3838948f-bb3f-43b7-98eb-fffeb251000d.png)
-The **CreateChannelConnection** function receives the interaction object when a user triggers the /play slash command. We use the interaction object to retrieve information about the VoiceChannel that the user is in and pass that information to the joinVoiceChannel function.
+The **CreateChannelConnection** function receives the interaction object when a user triggers the `/play` slash command. We use the interaction object to retrieve information about the VoiceChannel that the user is in and pass that information to the joinVoiceChannel function.
 
-The **DeleteChannelConnection** function receives the interaction object when a user triggers the /disconnect slash command. We use the interaction object to retrieve the active voice connection within the guild and then destroy it, disconnecting the bot.
+The **DeleteChannelConnection** function receives the interaction object when a user triggers the `/disconnect` slash command. We use the interaction object to retrieve the active voice connection within the guild and then destroy it, disconnecting the bot.
 
 The **subscribeChannelConnection** function is responsible for streaming the actual audio to the voice channel. It creates the audioPlayer object that holds our audio stream.
 
@@ -29,4 +29,4 @@ The **audioParser** function is used to take a search string or link and find th
 
 The **buildAudioStream** function grabs the first link in the array, creates a stream object, and builds and returns an AudioResource. This function should be called when a song finishes playing, so that the next song can be played.
 
-The **audioSkip** function is called when a user uses the /skip switch. It removes the currently playing song and plays the next song. The function checks the length of the array and determines whether to skip the song or disconnect the bot.
+The **audioSkip** function is called when a user uses the `/skip` switch. It removes the currently playing song and plays the next song. The function checks the length of the array and determines whether to skip the song or disconnect the bot.

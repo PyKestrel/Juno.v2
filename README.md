@@ -229,3 +229,4 @@ async function audioSkip(interaction) {
   }
 }
 ```
+<sub>[Coligo Studio](https://coligo.one)</sub>

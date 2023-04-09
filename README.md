@@ -1,5 +1,5 @@
 ![JunoBannerGithub2](https://user-images.githubusercontent.com/42158489/230739410-7d1a9c55-a193-4647-8f5d-15a92e6ba4cc.png)
-##
+***
 ![GitHub language count](https://img.shields.io/github/languages/count/pykestrel/juno.v2?color=33E9E0)
 ![GitHub repo file count](https://img.shields.io/github/directory-file-count/pykestrel/juno.v2?color=33E9E0)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/w/pykestrel/juno.v2?color=33E9E0)
@@ -17,6 +17,22 @@ The refresh includes:
 - Twitch Drop Notifier and much more!
 
 > Juno is a community-driven project designed to be customizable and modifiable by anyone. We encourage all users to contribute to the Discord community by creating new features that entertain and help everyone.
+
+![JunoSlashBanner](https://user-images.githubusercontent.com/42158489/230748776-05d0410d-e7ca-4849-a75f-08e06774b532.png)
+***
+### Slash Commands: Voice
+> Search For Music, Play Songs/Playlists From YouTube or Spotify!
++ `/play`
+  + `search` - Search the title of the song you would like to listen to!
+  + `youtube` - Provide a valid YouTube link that you would like to listen to!
+  + `spotify` - Provide a valid Spotify link that you would like to listen to!
+
+> Disconnect The Bot & Clear The Music Queue
++ `/disconnect`
+
+> Skip Current Playing Song
++ `/skip`
+
 
 ## ![JunoVCBanner2](https://user-images.githubusercontent.com/42158489/230748562-3838948f-bb3f-43b7-98eb-fffeb251000d.png)
 The **CreateChannelConnection** function receives the interaction object when a user triggers the `/play` slash command. We use the interaction object to retrieve information about the VoiceChannel that the user is in and pass that information to the joinVoiceChannel function.

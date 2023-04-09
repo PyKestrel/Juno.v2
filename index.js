@@ -122,7 +122,7 @@ async function deleteChannelConnection(interaction) {
 /*
 
 The subscribeChannelConnection is the next step in the Voice Channel connection and is in charge of streaming the actual audio to the voice channel.
-The function is in charge of building the audioPLayer object that will hold our audio stream.
+The function is in charge of building the player object that will hold our audio stream.
 
 */
 // Audio Player Object Instantiation
@@ -230,11 +230,39 @@ async function audioParser(interaction) {
       }
       break;
     case "spotify":
-      // NOTE ADD SPOTIFY LINK VALIDATION
+      /* 
+      
+      Spotify Works Similar to YouTube above we just query the Spotify URL and then return a Title,
+      we use that title to then run a youtube query and play the audio like that.
+      
+      */
+      let spot = await play.spotify(value);
+      // If the type is a regular track we could pull thet title of the song and treat it as a single video query
+      if (spot.type === "track") {
+        // Same system used above for youtube query
+        let yt_info = await play.search(spot.name, {
+          limit: 1,
+        });
+        // Push YouTube Link To Global Music Queue Array
+        globalMusicQueue.push(yt_info[0]);
+      } 
+      else if (spot.type === "album") {
+        // Treat the album as a playlist and run a special YouTube query for a related playlist, then parse teh playlist as usual.
+        let yt_info = await play.search(spot.name, {
+          limit: 1,
+          source: { youtube: "playlist" },
+        });
+        const playlist = await play.playlist_info(yt_info[0].url);
+        // Get Info For Each Video
+        const videos = await playlist.all_videos();
 
-      // Check Spotify Link Details
-      let result = await play.spotify(value);
-      console.log(result.name);
+        console.log(videos)
+        // For Each Video Object Get The URL and Push It To The Music Queue
+        videos.forEach((element) => {
+          globalMusicQueue.push(element);
+        });
+      }
+      // Add Support for Spotify Playlists
       break;
     default:
       break;

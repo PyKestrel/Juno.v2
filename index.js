@@ -399,6 +399,7 @@ client.on("interactionCreate", async (interaction) => {
       await deleteChannelConnection(interaction);
       // Delete previous message.
       await interaction.deleteReply();
+      console.log()
       break;
     default:
       break;

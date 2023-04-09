@@ -1,5 +1,5 @@
 ![JunoBannerGithub2](https://user-images.githubusercontent.com/42158489/230739410-7d1a9c55-a193-4647-8f5d-15a92e6ba4cc.png)
-
+##
 ![GitHub language count](https://img.shields.io/github/languages/count/pykestrel/juno.v2?color=33E9E0)
 ![GitHub repo file count](https://img.shields.io/github/directory-file-count/pykestrel/juno.v2?color=33E9E0)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/w/pykestrel/juno.v2?color=33E9E0)
@@ -18,7 +18,7 @@ The refresh includes:
 
 Juno is a community-driven project designed to be customizable and modifiable by anyone. We encourage all users to contribute to the Discord community by creating new features that entertain and help everyone.
 
-## Voice Channel Functions
+## ![JunoVCBanner2](https://user-images.githubusercontent.com/42158489/230748562-3838948f-bb3f-43b7-98eb-fffeb251000d.png)
 The **CreateChannelConnection** function receives the interaction object when a user triggers the /play slash command. We use the interaction object to retrieve information about the VoiceChannel that the user is in and pass that information to the joinVoiceChannel function.
 
 The **DeleteChannelConnection** function receives the interaction object when a user triggers the /disconnect slash command. We use the interaction object to retrieve the active voice connection within the guild and then destroy it, disconnecting the bot.

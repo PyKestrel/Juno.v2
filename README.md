@@ -20,7 +20,7 @@ The refresh includes:
 
 ![JunoSlashBanner](https://user-images.githubusercontent.com/42158489/230748776-05d0410d-e7ca-4849-a75f-08e06774b532.png)
 ***
-### Slash Commands: Voice
+### [Slash Commands: Voice](#VoiceCommands)
 > Search For Music, Play Songs/Playlists From YouTube or Spotify!
 + `/play`
   + `search` - Search the title of the song you would like to listen to!
@@ -37,7 +37,7 @@ The refresh includes:
 ![JunoUnderTheHood](https://user-images.githubusercontent.com/42158489/230749668-f80de1c0-de7f-4522-84e7-5597527cb2ec.png)
 > In the following sections, we will dive into Juno in more technical detail, focusing on how the slash commands work under the hood. This will give you insight into how we designed the various features and split the functions to create a cohesive and effective bot.
 ***
-
+### [](#UnderTheHood)
 ![JunoVCBanner2](https://user-images.githubusercontent.com/42158489/230749579-f476afc1-3121-4252-8cfe-8e4769a7fec7.png)
 ***
 <sub>*Updated 04/08/2023 - May Not Reflect Current Build*</sub>

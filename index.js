@@ -56,6 +56,12 @@ const commands = [
           "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT?si=e018a665dc3a428d"
         )
         .setRequired(false)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("radio")
+        .setDescription("Insert Internet Stream")
+        .setRequired(false)
     ),
   new SlashCommandBuilder()
     .setName("disconnect")
@@ -143,7 +149,12 @@ async function subscribeChannelConnection(interaction) {
     connection.subscribe(player);
 
     // Send Now Playing Embed
-    await nowPlayingEmbed(interaction);
+    if (interaction.options.data[0].name == "radio") {
+      interaction.channel.send("Playing Internet Stream");
+    } else {
+      await nowPlayingEmbed(interaction);
+    }
+
     // Play YTDL Stream
     player.play(await BuildAudioStream());
     globalMusicQueue.shift();
@@ -248,8 +259,7 @@ async function audioParser(interaction) {
         });
         // Push YouTube Link To Global Music Queue Array
         globalMusicQueue.push(yt_info[0]);
-      } 
-      else if (spot.type === "album") {
+      } else if (spot.type === "album") {
         // Treat the album as a playlist and run a special YouTube query for a related playlist, then parse teh playlist as usual.
         let yt_info = await play.search(spot.name, {
           limit: 1,
@@ -259,7 +269,7 @@ async function audioParser(interaction) {
         // Get Info For Each Video
         const videos = await playlist.all_videos();
 
-        console.log(videos)
+        console.log(videos);
         // For Each Video Object Get The URL and Push It To The Music Queue
         videos.forEach((element) => {
           globalMusicQueue.push(element);
@@ -267,8 +277,20 @@ async function audioParser(interaction) {
       }
       // Add Support for Spotify Playlists
       break;
+    case "radio":
+      globalMusicQueue.push({ url: value });
+      break;
     default:
       break;
+  }
+  if (option == "radio") {
+    // Clear Global Queue For Radio Stream
+    globalMusicQueue = []
+    // Build Special Radio Stream Object
+    await BuildRadioStream(interaction)
+  } else {
+    // Continue With Creating Stream From YouTube Links
+    await subscribeChannelConnection(interaction);
   }
 }
 
@@ -293,6 +315,27 @@ async function BuildAudioStream() {
 
   // Return Audio Resource Object
   return resource;
+}
+
+// Seperate Function that Handles Internet Streams, Completely Bypasses YouTube Stuff
+async function BuildRadioStream(interaction) {
+  // Grab Radio Link From Global Music Queue Array
+  let stream = globalMusicQueue[0].url;
+  // Get Voice Channel ID
+  const channel = interaction.member.voice.channel;
+
+  // Create Audio Resource From Stream
+  let resource = createAudioResource(stream);
+
+  // Assigne Audio Player Object To Player Variable
+  player = createAudioPlayer();
+  
+  await createChannelConnection(interaction);
+  const connection = getVoiceConnection(channel.guild.id);
+
+  // Create Subscription
+  connection.subscribe(player);
+  player.play(resource);
 }
 
 /*
@@ -331,11 +374,11 @@ Embeds Related To Audio Functions
 async function nowPlayingEmbed(interaction) {
   let video = globalMusicQueue[0];
   let nowPlayingEmbed = {
-    title: video.title,
-    description: video.description?.substring(0, 200),
+    title: video?.title,
+    description: video?.description?.substring(0, 200),
     color: 16711680,
     timestamp: new Date().toISOString(),
-    url: video.url,
+    url: video?.url,
     author: {
       name: "Juno | Now Playing",
       url: "https://coligo.one",
@@ -343,7 +386,7 @@ async function nowPlayingEmbed(interaction) {
         "https://cdn.discordapp.com/app-icons/1091691524640739420/1bec178a15e9c19dd2db579de06cd399.png?size=256",
     },
     thumbnail: {
-      url: video.thumbnails[0]?.url,
+      url: video?.thumbnails[0]?.url,
     },
     footer: {
       icon_url:
@@ -384,7 +427,6 @@ client.on("interactionCreate", async (interaction) => {
         interaction.deleteReply();
         // Calling functions to initiate the audio stream.
         await audioParser(interaction);
-        await subscribeChannelConnection(interaction);
       } catch (error) {
         console.log(error);
       }
@@ -399,7 +441,7 @@ client.on("interactionCreate", async (interaction) => {
       await deleteChannelConnection(interaction);
       // Delete previous message.
       await interaction.deleteReply();
-      console.log()
+      console.log();
       break;
     default:
       break;
